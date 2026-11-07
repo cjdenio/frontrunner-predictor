@@ -42,6 +42,14 @@ export default function App() {
       });
   }
 
+  function formatWhen(departureTime, now) {
+    if (departureTime >= now) {
+      return "in " + formatDistance(departureTime, now);
+    } else {
+      return formatDistance(now, departureTime) + " ago";
+    }
+  }
+
   function refreshUI() {
     setClock(getNow().toLocaleTimeString("en-US"));
 
@@ -50,13 +58,17 @@ export default function App() {
 
       setDepartures(
         loadedDepartures.current.departures
-          .filter((d) => new Date(d.departureTime) > getNow())
+          .filter(
+            (d) =>
+              new Date(d.departureTime).getTime() >
+              getNow().getTime() - 60 * 5 * 1000,
+          )
           .map((d) => {
             return {
               tripId: d.tripId,
               headsign: d.headsign,
               track: d.predictedPlatform,
-              when: formatDistance(new Date(d.departureTime), now),
+              when: formatWhen(new Date(d.departureTime), now),
             };
           }),
       );
@@ -126,9 +138,12 @@ export default function App() {
         ) : (
           <ul className="place-content-center grow">
             {departures.map((d) => (
-              <li key={d.tripId} className="text-center">
+              <li
+                key={d.tripId}
+                className={`text-center ${d.when.endsWith("ago") ? "text-gray-400" : ""}`}
+              >
                 {d.track == "1" && "⬅️ "}
-                {d.headsign} in {d.when}
+                {d.headsign} {d.when}
                 {d.track == "2" && " ➡️"}
               </li>
             ))}
