@@ -32,7 +32,7 @@ export default function App() {
   function loadDepartures(s) {
     setLoading(true);
     fetch(
-      `https://uta.clb.li/api/upcoming-departures?stationIds=${s}&from=${Math.round(getNow().getTime() / 1000)}`,
+      `https://uta.clb.li/api/upcoming-departures?stationIds=${s}&from=${Math.round(getNow().getTime() / 1000 - 60 * 5)}&to=3900`,
     )
       .then((r) => r.json())
       .then((r) => {
